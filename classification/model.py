@@ -16,7 +16,6 @@ class LitModel(L.LightningModule):
             lr: float = 1e-4,
             loss_func=nn.CrossEntropyLoss,
             val_interval: int = 1,
-            logger=None,
     ) -> None:
         super().__init__()
 
@@ -77,7 +76,7 @@ class LitModel(L.LightningModule):
         )
 
     def train_dataloader(self, imgs, labels, feature_vector, num_workers=2,
-                         spatial_transforms=None, intensity_transforms=None) -> DataLoader:
+                         spatial_transforms=None, intensity_transforms=None, **kwargs) -> DataLoader:
         # Return your dataloader for training
         return self._get_dataloader(
             imgs, labels, feature_vector,
@@ -85,22 +84,25 @@ class LitModel(L.LightningModule):
             num_workers=num_workers,
             shuffle=True,
             spatial_transformation=spatial_transforms,
-            intensity_transformation=intensity_transforms
+            intensity_transformation=intensity_transforms,
+            **kwargs
         )
 
-    def val_dataloader(self, imgs, labels, feature_vector, num_workers=2, transforms=None) -> DataLoader:
+    def val_dataloader(self, imgs, labels, feature_vector, num_workers=2, transforms=None, **kwargs) -> DataLoader:
         # Return your dataloader for validation
         return self._get_dataloader(
             imgs, labels, feature_vector,
             batch_size=self.batch_size,
             num_workers=num_workers,
             shuffle=False,
-            transforms=transforms
+            transforms=transforms,
+            **kwargs
         )
 
-    def test_dataloader(self, imgs, labels, feature_vector) -> DataLoader:
+    def test_dataloader(self, imgs, labels, feature_vector, **kwargs) -> DataLoader:
         return self._get_dataloader(
             imgs, labels, feature_vector,
             batch_size=1,
-            transforms=None
+            transforms=None,
+            **kwargs
         )

@@ -4,11 +4,19 @@ from monai.transforms import Randomizable, apply_transform
 
 
 class EnhancedImageDataset(ImageDataset):
-    def __init__(self, image_files, labels, feature_vector, spatial_transformation=None, intensity_transformation=None, **kwargs):
+    def __init__(
+            self,
+            image_files, labels, feature_vector,
+            spatial_transformation=None,
+            intensity_transformation=None,
+            verbose=False,
+            **kwargs
+    ):
         super().__init__(image_files=image_files, labels=labels, image_only=True, **kwargs)
+        self.feature_vector = feature_vector
         self.spatial_transformation = spatial_transformation
         self.intensity_transformation = intensity_transformation
-        self.feature_vector = feature_vector
+        self.verbose = verbose
 
         if isinstance(self.transform, Randomizable):
             self.transform.set_random_state(seed=self._seed)
@@ -42,4 +50,6 @@ class EnhancedImageDataset(ImageDataset):
             img = np.stack(sequences, axis=0)
             img = apply_transform(self.transform, img, map_items=False)
 
+        if self.verbose:
+            return img, features, label, self.image_files[index][0].split('/')[-1].split('.')[0].split('_')[0]
         return img, features, label
